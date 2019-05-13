@@ -1,178 +1,89 @@
-const int _RIGHT_IR_PIN_ = A7;
-const int _LEFT_IR_PIN_ = A6;
+#include <JellibiPin.h>
 
-const int _RIGHT_PWM_PIN_ = 6;
-const int _RIGHT_DIR_PIN_ = 8;
+#include <JellibiButton.h>
 
-const int _LEFT_PWM_PIN_ = 5;
-const int _LEFT_DIR_PIN_ = 7;
+JellibiPin _pin;
+JellibiButton _btnUP;
+JellibiButton _btnDown;
+JellibiButton _btnRight;
+JellibiButton _btnLeft;
 
-const int _BTN_UP_ = A0;    // UP 
-const int _BTN_DOWN_ = A1;  // Down
+const int _speed = 100;
+double _centerValue = 0;
+bool _bRun = false;
+bool _bDebug = false;
 
-// 높아지면 STOP
-int _nLeftReference;
-int _nRightReference;
-
-class Wheel
-{
-private:
-  int _pwmPin;
-  int _dirPin;
-  int _curDuty;
-  bool _bRightwheel;
-  const int _REF_DUTY_ = 120;
-public:  
-  Wheel()
-  : _pwmPin(0)
-  , _bRightwheel(false)
-  , _dirPin(0)
-  , _curDuty(_REF_DUTY_)
-  {
-    
-  }
-  void Init(int pwmPin, int dirPin, bool bRightWheel) 
-  {
-    _pwmPin = pwmPin;
-    _dirPin = dirPin;
-    _bRightwheel = bRightWheel;
-    pinMode(_pwmPin, OUTPUT);
-    pinMode(_dirPin, OUTPUT);
-    digitalWrite(_dirPin, (_bRightwheel)?LOW:HIGH);   
-     
-    analogWrite(_pwmPin, _curDuty - (bRightWheel)?10:0);
-  }
-  void Start(){
-    _curDuty = _REF_DUTY_;
-    analogWrite(_pwmPin, _curDuty);  
-  }
-  void StepDown()
-  {
-    if (_curDuty > 8)
-      _curDuty -=8;
-    analogWrite(_pwmPin, _curDuty);
-  }
-  void StepToREF()
-  {
-    if (_curDuty < _REF_DUTY_)
-    {
-      _curDuty+=5;
-      analogWrite(_pwmPin, _curDuty);
-    }
-  }
-  void Stop()
-  {
-    _curDuty = 0;
-    analogWrite(_pwmPin, _curDuty);
-  }
-};
-class Button
-{
-private:
-  int _nPinNumber;
-  int _nCurState;
-    
-  bool _bRepeatFlag; 
-  const int _REPEAT_INTERVAL_ = 15;  
-  int  _nLastRepeatTime;
-public:
-  Button()
-  : _nPinNumber(0)
-  , _bRepeatFlag(false)
-  , _nLastRepeatTime(millis())
-  , _nCurState(HIGH)
-  {
-  }
-  void Init(int nPin, bool bRepeat = false)
-  {
-    _nPinNumber = nPin;
-    _bRepeatFlag = bRepeat;
-    pinMode(_nPinNumber, INPUT);
-  }
-  bool Check() 
-  {
-    bool bEvent = false;
-    int nCurState = digitalRead(_nPinNumber);
-    if (nCurState) 
-    {
-      _nCurState = nCurState;
-    } 
-    else 
-    { 
-      if (nCurState != _nCurState) // Event Occured 
-      {
-        _nCurState = nCurState;
-        _nLastRepeatTime = millis();    
-        bEvent = true;
-      } 
-      else if (_bRepeatFlag) 
-      {  // Repeat Check
-        int cur = millis();
-        if (cur > _nLastRepeatTime + _REPEAT_INTERVAL_) 
-        {
-          _nLastRepeatTime = cur;  
-          bEvent = true;
-        }
-      }
-    }
-    return bEvent;
-  }
-};
-
-Wheel rightW;
-Wheel leftW;
-
-Button btnUP;
-Button btnDown;
-
-void Trace()
-{
-  // put your main code here, to run repeatedly:
-  int right = analogRead(_RIGHT_IR_PIN_)>>6;
-  int left = analogRead(_LEFT_IR_PIN_)>>6;
-  
-  //Serial.print( String(left)+ "["+String(_nLeftReference)+"]"+"/"+String(right)+"["+String(_nRightReference)+"]"+"\n");  
-
-  if (right > _nRightReference) {
-    rightW.StepDown();
-  } else {
-    rightW.StepToREF();
-  }
-  if (left > _nLeftReference) {
-    leftW.StepDown();
-  } else {
-    leftW.StepToREF();
-  }
-}
-
-
+void MoveJellibi();
+void StopJellibi();
+void DebugJellibi();
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(_RIGHT_IR_PIN_, INPUT);
-  pinMode(_LEFT_IR_PIN_, INPUT);
   Serial.begin(9600);
-
-  rightW.Init(_RIGHT_PWM_PIN_, _RIGHT_DIR_PIN_, true);
-  leftW.Init(_LEFT_PWM_PIN_, _LEFT_DIR_PIN_, false);
-  btnUP.Init(_BTN_UP_, false);
-  btnDown.Init(_BTN_DOWN_, false);
+  _btnUP.Init(_pin.Button(U), false);
+  _btnDown.Init(_pin.Button(D), false);
+  _btnRight.Init(_pin.Button(R), false);
+  _btnRight.Init(_pin.Button(L), false);
+  pinMode(_pin.Ir(L), INPUT);
+  pinMode(_pin.Ir(R), INPUT);  
+  pinMode(_pin.WheelDir(L), OUTPUT);
+  pinMode(_pin.WheelDir(R), OUTPUT);
 }
-bool g_bRun = false;
+
 void loop() {
-  if (btnUP.Check() && (!g_bRun)){
-    _nRightReference = (analogRead(_RIGHT_IR_PIN_)>>6);
-    _nLeftReference= (analogRead(_LEFT_IR_PIN_)>>6);
-    rightW.Start();
-    g_bRun = true;
-    leftW.Start();
+  // put your main code here, to run repeatedly:
+  if (_btnUP.Check() && !_bRun) {
+    _bRun = true;
+    _centerValue = analogRead(_pin.Ir(R)) - analogRead(_pin.Ir(L));
   }
-  if (btnDown.Check() && (g_bRun)){
-    g_bRun = false;
-    leftW.Stop();
-    rightW.Stop();
+
+  if (_btnDown.Check()&& _bRun) {
+    _bRun = false;
   }
-  if (g_bRun){
-    Trace();
+  
+  if (_btnRight.Check()) {
+    _bDebug = true;
   }
+  
+  if (_btnLeft.Check()) {
+    _bDebug = false;
+  }
+  
+  if (_bRun) {
+    MoveJellibi();
+  } else {
+    StopJellibi();
+  }
+}
+void StopJellibi()
+{
+  analogWrite( _pin.Wheel(L), 0);
+  analogWrite( _pin.Wheel(R), 0);
+}
+void MoveJellibi()
+{
+  double turnSpeed = ((analogRead(_pin.Ir(R))-analogRead(_pin.Ir(L))) - _centerValue ) /4;
+  double leftSpeed = _speed + turnSpeed;
+  double rightSpeed = _speed - turnSpeed;
+  if (_bDebug && Serial) {
+    Serial.print(String(_centerValue));
+    Serial.print("/");
+    Serial.print(String(turnSpeed));
+    Serial.print(" -=> ");
+    Serial.print(String(leftSpeed));
+    Serial.print(" : ");
+    Serial.println(String(rightSpeed));
+  }
+  if (leftSpeed > 0) {
+    digitalWrite(_pin.WheelDir(L), 1);
+  } else {
+    digitalWrite(_pin.WheelDir(L), 0);
+  }
+  if (rightSpeed > 0 ) {
+    digitalWrite(_pin.WheelDir(R), 0);
+  } else {
+    digitalWrite(_pin.WheelDir(R), 1);
+  }
+  analogWrite( _pin.Wheel(L), round(abs(leftSpeed)));
+  analogWrite( _pin.Wheel(R), round(abs(rightSpeed)));
 }
