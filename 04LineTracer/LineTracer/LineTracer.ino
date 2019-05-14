@@ -23,11 +23,12 @@ void setup() {
   _btnUP.Init(_pin.Button(U), false);
   _btnDown.Init(_pin.Button(D), false);
   _btnRight.Init(_pin.Button(R), false);
-  _btnRight.Init(_pin.Button(L), false);
+  _btnLeft.Init(_pin.Button(L), false);
   pinMode(_pin.Ir(L), INPUT);
   pinMode(_pin.Ir(R), INPUT);  
   pinMode(_pin.WheelDir(L), OUTPUT);
   pinMode(_pin.WheelDir(R), OUTPUT);
+  pinMode(_pin.Led(C), OUTPUT);
 }
 
 void loop() {
@@ -41,16 +42,17 @@ void loop() {
     _bRun = false;
   }
   
-  if (_btnRight.Check()) {
-    _bDebug = true;
+  if (_btnRight.Check() && _bRun) {
+    _bRun = false;
   }
   
-  if (_btnLeft.Check()) {
-    _bDebug = false;
+  if (_btnLeft.Check() && _bRun) {
+    Serial.print("left\n");
+    _bRun = false;
   }
   
   if (_bRun) {
-    MoveJellibi();
+    MoveJellibi(); 
   } else {
     StopJellibi();
   }
@@ -65,15 +67,7 @@ void MoveJellibi()
   double turnSpeed = ((analogRead(_pin.Ir(R))-analogRead(_pin.Ir(L))) - _centerValue ) /4;
   double leftSpeed = _speed + turnSpeed;
   double rightSpeed = _speed - turnSpeed;
-  if (_bDebug && Serial) {
-    Serial.print(String(_centerValue));
-    Serial.print("/");
-    Serial.print(String(turnSpeed));
-    Serial.print(" -=> ");
-    Serial.print(String(leftSpeed));
-    Serial.print(" : ");
-    Serial.println(String(rightSpeed));
-  }
+
   if (leftSpeed > 0) {
     digitalWrite(_pin.WheelDir(L), 1);
   } else {
