@@ -128,11 +128,11 @@ void setup() {
 void loop() {
     // A2 에 연결된 조도센서에서 밝기의 정도를 ADC 함
     // 아두이노에서 아날로그포트의 값을 ADC 할 때 analogRead 함수를 사용합니다.
-    // 응답값의 범위는 0 ~ 1024 입니다. 최대값이 1024인 이유는  
+    // 응답값의 범위는 0 ~ 1023 입니다. 최대값이 1023인 이유는  
     // 칩(Atmel328P) 의 구성에 따라 달라지게 됩니다. 
     int level = analogRead(A2);
     Serial.print("CDS Level :");
-    Serial.println(String(level));
+    Serial.println(level);
 }
 ```
 

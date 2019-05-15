@@ -7,9 +7,7 @@
 그리퍼는 사람의 손가락을 흉내내어 사물을 쥐거나 놓을 수 있도록  만들어진 구조입니다.   
 젤리비보드에 두 개의 서보모터를 적용하여 Gripper 로 동작할 수 있습니다.  
 
-서보모터의 동작 범위는 0도에서 180 도로 로봇젤리비의 그리퍼를 제어하기에는 너무 범위가 넓어 사용할 수 없는 영역도 존재하게 됩니다. 
-
-_**ServoAdjust**_ 샘플을 통해서 Gripper 로 알맞게 동작하기 위해, 두 개의 서보를 어느 정도 각도로  제어하여야 하는 지 알아 낼 수 있습니다. 
+로봇젤리비에서 사용하는 서보모터는 동작 범위가 0도에서 180 도로써 그리퍼로 제어하는데 필요한 범위를 넘어섭니다. _**ServoAdjust**_ 샘플을 통해서 Gripper 로 알맞게 동작하기 위해, 두 개의 서보를 어느 정도 각도로  제어하여야 하는 지 알아 낼 수 있습니다. 
 
 ### Source Code 
 
@@ -51,6 +49,7 @@ JellibiButton _down;
 int _angle = 45;   // Servo 모터의 제어 각도값을 할당
 int _servoPin = SERVO01_PIN;  // Servo 01 포트인 9번을 할당 
 void setup() {
+    Serial.begin(115200);
     _up.Init(A0, true);       // A0 포트를 _up 인스턴스로 감시하도록 초기화 
     _down.Init(A1, true);     // A1 포트를 _down 인스턴스로 감시하도록 초기화
     _servo.attach(_servoPin); // _servoPin 에 할당된 Servo 01 포트를   
@@ -61,14 +60,14 @@ void setup() {
 
 
 
-loop()` 함수에서는 버튼의 눌림을 감지하여 제어 각도를 가감하고 그 값을 서보에 적용합니다.  
+`loop()` 함수에서는 버튼의 눌림을 감지하여 제어 각도를 가감하고 그 값을 서보에 적용합니다.  
 
 ``` c++
 void loop() {
   if (_up.Check()) {
     _angle++;
-    if (_angle > _MAX_ANGLE_){
-      _angle = _MAX_ANGLE_;
+    if (_angle > 180){
+      _angle = 180;
     }
     _servo.write(_angle);
     Monitor();	// 현재 서보 제어 상태를 시리얼 포트로 전송 
@@ -76,8 +75,8 @@ void loop() {
   
   if (_down.Check()) {
     _angle--;
-    if (_angle < _MIN_ANGLE_) {
-      _angle = _MIN_ANGLE_;
+    if (_angle < 0) {
+      _angle = 0;
     }
     _servo.write(_angle);
     Monitor(); // 현재 서보 제어 상태를 시리얼 포트로 전송 
@@ -89,9 +88,8 @@ void loop() {
 
 ### _**ServoAdjust.ino**_ 실행
 
-1. 아두이노가 설치 된 PC 와 젤리비보드를  USB 케이블로 연결하고 전원스위치를 켭니다.   
+1. 아두이노가 설치 된 PC 와 Gripper 를 연결한 젤리비보드를  USB 케이블로 연결하고 전원스위치를 켭니다.   
    이 때 젤리비보드의 `PWR` LED 가 녹색으로 켜집니다.  
-   젤리비보드에는 또 젤리비 Gripper 를 연결합니다. 
 2. 아두이노 툴을 PC 에서 실행시키고 젤리비보드와 연결된 포트를 메뉴(툴 > 포트)에서 선택합니다.  
    또, 메뉴(툴 > 보드) 에서 'Arduino Nano' 를 선택하고 프로세서 메뉴(툴> 프로세서) 도  'Atmega328P (old bootloader)' 를 선택합니다.
 3. **ServoAdjust.ino** 파일을 아두이노 툴에서 열고 `컴파일(Ctrl+R)`합니다.
