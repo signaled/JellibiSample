@@ -129,7 +129,7 @@ void loop() {
     // A2 에 연결된 조도센서에서 밝기의 정도를 ADC 함
     // 아두이노에서 아날로그포트의 값을 ADC 할 때 analogRead 함수를 사용합니다.
     // 응답값의 범위는 0 ~ 1023 입니다. 최대값이 1023인 이유는  
-    // 칩(Atmel328P) 의 구성에 따라 달라지게 됩니다. 
+    // 칩(Atmega328P) 의 구성에 따라 달라지게 됩니다. 
     int level = analogRead(A2);
     Serial.print("CDS Level :");
     Serial.println(level);
@@ -140,7 +140,7 @@ void loop() {
 
 ### PWM (Pulse Width Modulation)
 
-PWM 은 주기를 가지는 파형을 이야기 합니다.  젤리비 보드에서는 이 PWM 파형을 만들어 모터(주행용 DC 모터, 그리퍼용 서보모터) 의 회전 속도를 제어하고 또 LED 의 밝기를 제어할 수 있습니다. 
+PWM 은 주기를 가지는 파형을 이야기 합니다.  젤리비 보드에서는 이 PWM 파형을 만들어 모터(주행용 DC 모터, 그리퍼용 서보모터) 의 회전 속도 또는 회전 각도를 제어합니다. 또 LED 의 밝기도 제어할 수 있습니다. 
 
 PWM 은 주기(Period) 와 듀티비(Duty ratio) 로 구성되는데, 주기는 한펄스가 만들어지는데 소요되는 시간이며 듀티비는 한펄스 에서 HIGH 인 구간이 얼마나 차지하는지(또는 LOW인 구간이 얼마나 되는지)를 나타내는데 이 두가지로 파형이 어떻게 생겼는지 판단할 수 있습니다. 
 
@@ -151,29 +151,37 @@ LED 와 연결된 핀(포트) 에서 PWM 을 만들어내고 듀티비에 조작
 젤리비보드에서는 주기는 제어하지 않고 듀티비만을 조작하여 연결된 모터를 제어를 하게 됩니다. 
 
 ``` cpp 
-void setup() {
-	// 로봇젤리비의 모터의 회전속도를 제어하는 PWM 신호를 5번 핀과 6번 핀으로 전달합니다. 
+void setup() { 
+  	// 5, 6, 10, 11번 핀에서 PWM을 출력하기 위해 
+    // 핀 속성을 OUTPUT 으로 설정합니다.
     pinMode(5, OUTPUT);
     pinMode(6, OUTPUT);
+    pinMode(11, OUTPUT);
+    pinMode(10, OUTPUT);
 }
 void loop() {
-    // 5번핀 과 6번핀에 연결된 모터를 가속합니다. 
+    // 5번핀 과 6번핀에 연결된 모터를 가감속합니다.
+    // 10번핀과 11번핀에 연결된 LED의 밝기를 조정합니다.
     // 최대값은 255 이고 이때 듀티비는 100% 입니다.
     // 128 일 때에는 50%, 0일 때에는 0% 입니다.
-    for (int i=0;i<255; i+=10){
+    for (int i=0;i<255; i+=5){
         analogWrite(5, i);
         analogWrite(6, i);
+        analogWrite(11, i);
+        analogWrite(10, i);
         delay(50);
     }
     
-    delay(1000);
+    delay(100);
     // 5번핀과 6번핀에 연결된 모터를 감속함
-    for (int i=255; i>=0; i-=10) {
+    for (int i=255; i>=0; i-=5) {
         analogWrite(5, i);
         analogWrite(6, i);
+        analogWrite(11, i);
+        analogWrite(10, i);
         delay(50);
     }
-    delay(1000);
+    delay(100);
 }
 ```
 
