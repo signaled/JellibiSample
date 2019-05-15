@@ -15,7 +15,6 @@ bool _bDebug = false;
 
 void MoveJellibi();
 void StopJellibi();
-void DebugJellibi();
 
 void setup() {
   // put your setup code here, to run once:
@@ -64,7 +63,7 @@ void StopJellibi()
 }
 void MoveJellibi()
 {
-  double turnSpeed = ((analogRead(_pin.Ir(R))-analogRead(_pin.Ir(L))) - _centerValue ) /4;
+  double turnSpeed = ((analogRead(_pin.Ir(R))-analogRead(_pin.Ir(L))) - _centerValue )/4;
   double leftSpeed = _speed + turnSpeed;
   double rightSpeed = _speed - turnSpeed;
 
