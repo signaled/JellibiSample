@@ -1,20 +1,30 @@
 # Quick Reference "Jellibi = Arduino Nano" 
 
- [코드크런치 까페(네이버)](https://cafe.naver.com/codecrunch)   
 
- <TABLE>
- <TR><TD nowrap>
-     <a href="https://smartstore.naver.com/robotnmore" target=new>
-         <img src="https://dthumb-phinf.pstatic.net/?src=%22http%3A%2F%2Fwww.robotnmore.com%2Fdownload%2Fcodecrunch%2Fcafe_door_20190225_01.jpg%22&type=cafe_wa740">
-     </a>    
-     <a href="https://www.facebook.com/codecrunch.official/" target=new>
-     <img src="https://dthumb-phinf.pstatic.net/?src=%22http%3A%2F%2Fwww.robotnmore.com%2Fdownload%2Fcodecrunch%2Fcafe_door_20190225_02.jpg%22&type=cafe_wa740">
-     </a>
-     <a href="https://www.instagram.com/codecrunch.official/" target=new>
-     <img src="https://dthumb-phinf.pstatic.net/?src=%22http%3A%2F%2Fwww.robotnmore.com%2Fdownload%2Fcodecrunch%2Fcafe_door_20190225_03.jpg%22&type=cafe_wa740">
-     </a>
-     </TD></TR>
- </TABLE>
+<table id="Table_01" width="855" height="102" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td>
+			<a href="https://smartstore.naver.com/robotnmore" target="_blank" border="0">
+				<img src="http://www.robotnmore.com/img/rnm_sns01.jpg" width="215" height="102" alt="코드크런치스토어팜">
+			</a>
+		</td>
+		<td>
+			<a href="https://www.facebook.com/codecrunch.official/" target="_blank" border="0">
+				<img src="http://www.robotnmore.com/img/rnm_sns02.jpg" width="209" height="102" alt="코드크런치페이스북">
+			</a>
+		</td>
+		<td>
+			<a href="https://www.instagram.com/codecrunch.official/" target="_blank" border="0">
+				<img src="http://www.robotnmore.com/img/rnm_sns03.jpg" width="210" height="102" alt="코드크런치인스타그램">
+		</td>
+			</a>
+		<td>
+			<a href="https://cafe.naver.com/codecrunch" target="_blank" border="0">
+				<img src="http://www.robotnmore.com/img/rnm_sns04.jpg" width="221" height="102" alt="코드크런치네이버카페">
+			</a>
+		</td>
+	</tr>
+</table>
 
 
 `JellibiSample` 저장소(https://github.com/signaled/JellibiSample) 는 아두이노나노 호환보드인 젤리비보드를 이용하여 주행로봇, 그리퍼등을 구현하는 샘플코드가 있습니다.  
@@ -152,7 +162,7 @@ LED 와 연결된 핀(포트) 에서 PWM 을 만들어내고 듀티비에 조작
 
 ``` cpp 
 void setup() { 
-  	// 5, 6, 10, 11번 핀에서 PWM을 출력하기 위해 
+    // 5, 6, 10, 11번 핀에서 PWM을 출력하기 위해   
     // 핀 속성을 OUTPUT 으로 설정합니다.
     pinMode(5, OUTPUT);
     pinMode(6, OUTPUT);
